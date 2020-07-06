@@ -50,12 +50,12 @@ async function main() {
 
 //Statuanfrage an alle Clients
 async function sendMessage(msg) {
-	var allClients =  await clients.matchAll({ includeUncontrolled: true});  // Liste aller Clients
+	var allClients =  await clients.matchAll({ includeUncontrolled: true});    // Liste aller Clients
 	return Promise.all(
 		allClients.map(function clientMsg(client){
-			var channel = new MessageChannel();   			//neuer Messagechannel für jeden Client
+			var channel = new MessageChannel();   			 //neuer Messagechannel für jeden Client
 			channel.port1.onmessage = onMessage; 			//auf Statusupdates auf aktuellen Message Channel lauschen
-			return client.postMessage(msg,[channel.port2]); // Statusanfrage senden
+			return client.postMessage(msg,[channel.port2]);        // Statusanfrage senden
 
 		})
 	);
@@ -81,16 +81,16 @@ async function proxyRouter(req) {
 	var cache = await caches.open(cacheName);
 
 	//Caching Strategie: Server anfragen, GETs cachen, response vom Server an Client zurück, wenn fehlschlägt eigene 404 Ajax Antwort
-	if (url.origin == location.origin) {	//Anfragen nur an unsere Webseite ohne zusätzliche Anfragen an Drittanbieter (Frameworks etc.)
+	if (url.origin == location.origin) {		//Anfragen nur an unsere Webseite ohne zusätzliche Anfragen an Drittanbieter (Frameworks etc.)
 		//API Anfragen handlen
-		if (/^\/api\/.+$/.test(reqURL)) {  //get-posts
+		if (/^\/api\/.+$/.test(reqURL)) {     //get-posts
 			let fetchOptions = {
 				credentials: "same-origin",
 				cache: "no-store"
 			};
 			let res = await safeRequest(reqURL,req,fetchOptions,/*cacheResponse=*/false,/*checkCacheFirst=*/false,/*checkCacheLast=*/true,/*useRequestDirectly=*/true);
 			if (res) {
-				if (req.method == "GET") {  				//SW cached nur GET requests, deswegen cacheResponse = false, 
+				if (req.method == "GET") {  			//SW cached nur GET requests, deswegen cacheResponse = false, 
 					await cache.put(reqURL,res.clone());   //Antwort muss geklont werden wenn mehrfachverwendung aus dem Cache
 				}
 				return res;
@@ -112,7 +112,7 @@ async function proxyRouter(req) {
 							headers: req.headers,
 							credentials: "same-origin",
 							cache: "no-store",
-							redirect: "manual"  //SW übernimmt redirect
+							redirect: "manual"  //SW übernimmt weiterleitung
 						};
 						res = await safeRequest(reqURL,req,fetchOptions);  //Anfrage vom Server direkt nutzen sonst Cache checken
 						//Server leitet automatisch von login zu add-post weiter, SW ahmt Verhalten nach
@@ -308,15 +308,15 @@ async function onInstall(evt) {
 }
 
 function onActivate(evt) {
-	evt.waitUntil(handleActivation()); 			//Browser informieren noch nicht alle Prozesse zu beenden bis alles gecached ist
+	evt.waitUntil(handleActivation()); 	//Browser informieren noch nicht alle Prozesse zu beenden bis alles gecached ist
 	
 }
 //neuer SW
 //Wenn neuer SW registriert ist, wird dieser nicht benutzt bis zum nächsten laden der Seite 
 async function handleActivation() {
-	await clearCaches(); 			 //da neuer SW lösche alte Caches
+	await clearCaches(); 				//da neuer SW lösche alte Caches
 	await cacheLoggedOutFiles(/*forceReload=*/true);
-	await clients.claim();    		//nutze neuen SW direkt und nicht bis zum nächsten laden der Seite
+	await clients.claim();    			//nutze neuen SW direkt und nicht bis zum nächsten laden der Seite
 	console.log(`Service Worker (${version}) activated... `);
 }
 
@@ -451,7 +451,7 @@ async function cacheLoggedOutFiles(forceReload = false) {
 
 				let fetchOptions = {
 					method: "GET",
-					cache: "no-cache",  //wollen frische Egebnisse vom Server nicht vom Cache
+					cache: "no-cache",   //wollen frische Egebnisse vom Server nicht vom Cache
 					credentials: "omit" // ausgeloggte HMTL Seiten
 				};
 				res = await fetch(url, fetchOptions);
